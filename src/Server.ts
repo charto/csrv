@@ -41,9 +41,16 @@ export class Server {
 		});
 	}
 
-	report(res: http.ServerResponse, status: number, header?: Object) {
-		res.writeHead(status, header || {});
-		res.end();
+	sendStatus(res: http.ServerResponse, status: number, header?: Object) {
+		var body = new Buffer(status + '\n', 'utf-8');
+
+		header = header || {};
+
+		header['Content-Type'] = 'text/plain';
+		header['Content-Length'] = body.length;
+
+		res.writeHead(status, header);
+		res.end(body);
 	}
 
 	processRequest(req: http.IncomingMessage, res: http.ServerResponse) {
@@ -58,13 +65,13 @@ export class Server {
 
 		// Reject all invalid paths.
 
-		if(!pathParts) return(this.report(res, 403));
+		if(!pathParts) return(this.sendStatus(res, 403));
 
 		var urlPath = pathParts[0];
 
 		// Redirect root to the www directory.
 
-		if(urlPath == '/') return(this.report(res, 302, {
+		if(urlPath == '/') return(this.sendStatus(res, 302, {
 			'Location': '/www/' + (urlParts.search || '')
 		}));
 
@@ -82,7 +89,7 @@ export class Server {
 
 			// Redirect accesses to directories not marked as such; append a slash.
 
-			if(stats.isDirectory()) return(this.report(res, 302, {
+			if(stats.isDirectory()) return(this.sendStatus(res, 302, {
 				'Location': urlPath + '/' + (urlParts.search || '')
 			}));
 
@@ -102,7 +109,7 @@ export class Server {
 
 			fs.createReadStream(filePath).pipe(res);
 		} catch(err) {
-			this.report(res, 404);
+			this.sendStatus(res, 404);
 		}
 	}
 
