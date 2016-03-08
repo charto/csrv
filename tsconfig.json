@@ -11,6 +11,7 @@
 	"files": [
 		"typings/main.d.ts",
 
-		"src/serve.ts"
+		"src/csrv.ts",
+		"src/cli.ts"
 	]
 }

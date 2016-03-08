@@ -2,6 +2,7 @@
   "name": "csrv",
   "version": "0.0.1",
   "description": "Compact development web server",
+  "main": "dist/csrv.js",
   "bin": {
     "csrv": "csrv-cli.js"
   },
@@ -9,7 +10,7 @@
     "tsc": "tsc",
     "typings": "typings",
     "start": "node dist/serve.js",
-    "test": "echo No test yet...",
+    "test": "node dist/serve.js --help",
     "prepublish": "typings install && tsc"
   },
   "author": "Juha Järvi",
@@ -25,5 +26,8 @@
   "devDependencies": {
     "typescript": "~1.8.7",
     "typings": "~0.6.9"
+  },
+  "dependencies": {
+    "commander": "^2.9.0"
   }
 }
