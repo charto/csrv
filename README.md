@@ -7,6 +7,21 @@ csrv
 
 This is a web server for Node.js development.
 
+Usage
+-----
+
+```
+  Usage: csrv [options] <path>
+
+  Compact development web server
+
+  Options:
+
+    -h, --help         output usage information
+    -V, --version      output the version number
+    -p, --port <port>  Bind the server to <port>
+```
+
 API
 ===
 Docs generated using [`docts`](https://github.com/charto/docts)
