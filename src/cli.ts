@@ -23,6 +23,14 @@ if(process.argv.length < 3) cmd.help();
 
 function handleStart(basePath: string, opts: { [key: string]: any }) {
 	basePath = path.resolve('.', basePath);
+	var port = +opts['port'];
 
-	new Server(basePath).listen(+opts['port']);
+	new Server(basePath).listen(port, (err: NodeJS.ErrnoException) => {
+		if(err) {
+			if(err.code == 'EACCES' || err.code == 'EADDRINUSE') {
+				console.error('Error binding to port ' + port);
+				console.error('Try a different one as argument, like npm start -- -p 8080');
+			}
+		} else console.log('Listening on port ' + port);
+	});
 }

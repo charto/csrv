@@ -1,6 +1,6 @@
 {
   "name": "csrv",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Compact development web server",
   "main": "dist/csrv.js",
   "bin": {
@@ -23,11 +23,11 @@
     "url": "https://github.com/charto/csrv/issues"
   },
   "homepage": "https://github.com/charto/csrv#readme",
-  "devDependencies": {
-    "typescript": "~1.8.7",
-    "typings": "~0.6.9"
-  },
   "dependencies": {
-    "commander": "^2.9.0"
+    "commander": "~2.9.0"
+  },
+  "devDependencies": {
+    "typescript": "^1.8.9",
+    "typings": "~0.7.12"
   }
 }

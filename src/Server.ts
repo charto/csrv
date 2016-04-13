@@ -17,8 +17,7 @@ var mimeTbl: {[extension: string]: string} = {
 	png: 'image/png'
 };
 
-/** This is a minimal (but hopefully secure) web server to open the frontend in a browser.
-  * A proper backend also with nicer development features will be a separate package. */
+/** This is a minimal (but hopefully secure) web server for testing frontends. */
 
 export class Server {
 	constructor(basePath: string) {
@@ -30,16 +29,14 @@ export class Server {
 		);
 	}
 
-	listen(port: number) {
-		this.server.listen(port, () => {
-			console.log('Listening on port ' + port);
-		}).on('error', (err: NodeJS.ErrnoException) => {
-			if(err.code == 'EACCES' || err.code == 'EADDRINUSE') {
-				console.error('Error binding to port ' + port);
-				console.error('Try a different one as argument, like npm start -- 8080');
-			} else throw(err);
-		});
+	/** Bind the server to a port. Takes a Node-style callback. */
+
+	listen(port: number, cb: (err: NodeJS.ErrnoException) => void) {
+		this.server.listen(port, () => cb(null)).on('error', cb);
 	}
+
+	/** Report status with just the code as a body.
+	  * Additional headers can be passed eg. for redirecting. */
 
 	sendStatus(res: http.ServerResponse, status: number, header?: Object) {
 		var body = new Buffer(status + '\n', 'utf-8');
@@ -68,12 +65,6 @@ export class Server {
 		if(!pathParts) return(this.sendStatus(res, 403));
 
 		var urlPath = pathParts[0];
-
-		// Redirect root to the www directory.
-
-		if(urlPath == '/') return(this.sendStatus(res, 302, {
-			'Location': '/www/' + (urlParts.search || '')
-		}));
 
 		// Silently redirect obvious directory paths (ending with a slash) to an index file.
 
