@@ -11,8 +11,7 @@
     "tsc": "tsc",
     "docts": "docts",
     "typings": "typings",
-    "start": "node dist/serve.js",
-    "test": "node dist/serve.js --help",
+    "test": "node csrv-cli.js --help",
     "prepublish": "typings install && tsc"
   },
   "author": "Juha Järvi",
