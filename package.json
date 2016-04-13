@@ -3,11 +3,13 @@
   "version": "0.0.2",
   "description": "Compact development web server",
   "main": "dist/csrv.js",
+  "typings": "dist/csrv.d.ts",
   "bin": {
     "csrv": "csrv-cli.js"
   },
   "scripts": {
     "tsc": "tsc",
+    "docts": "docts",
     "typings": "typings",
     "start": "node dist/serve.js",
     "test": "node dist/serve.js --help",
@@ -27,6 +29,7 @@
     "commander": "~2.9.0"
   },
   "devDependencies": {
+    "docts": "~0.0.4",
     "typescript": "^1.8.9",
     "typings": "~0.7.12"
   }
