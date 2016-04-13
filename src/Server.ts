@@ -38,7 +38,7 @@ export class Server {
 	/** Report status with just the code as a body.
 	  * Additional headers can be passed eg. for redirecting. */
 
-	sendStatus(res: http.ServerResponse, status: number, header?: Object) {
+	sendStatus(res: http.ServerResponse, status: number, header?: { [key: string]: string | number }) {
 		var body = new Buffer(status + '\n', 'utf-8');
 
 		header = header || {};
