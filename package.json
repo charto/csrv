@@ -1,18 +1,15 @@
 {
   "name": "csrv",
-  "version": "0.0.2",
+  "version": "0.1.0",
   "description": "Compact development web server",
   "main": "dist/csrv.js",
   "typings": "dist/csrv.d.ts",
   "bin": {
-    "csrv": "csrv-cli.js"
+    "csrv": "bin/csrv.js"
   },
   "scripts": {
     "tsc": "tsc",
-    "docts": "docts",
-    "typings": "typings",
-    "test": "node csrv-cli.js --help",
-    "prepublish": "typings install && tsc"
+    "prepublish": "tsc -p src"
   },
   "author": "Juha Järvi",
   "license": "MIT",
@@ -24,12 +21,8 @@
     "url": "https://github.com/charto/csrv/issues"
   },
   "homepage": "https://github.com/charto/csrv#readme",
-  "dependencies": {
-    "commander": "~2.9.0"
-  },
   "devDependencies": {
-    "docts": "~0.0.4",
-    "typescript": "^1.8.9",
-    "typings": "~0.7.12"
+    "@types/node": "^8.0.26",
+    "typescript": "^2.5.2"
   }
 }

@@ -1,7 +1,6 @@
 node_modules/
-typings/
 src/
-.travis.yml
+package-lock.json
 *.log.*
 *.log
 *.tgz

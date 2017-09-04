@@ -1,9 +1,0 @@
-{
-  "name": "csrv",
-  "version": false,
-  "dependencies": {},
-  "ambientDependencies": {
-    "commander": "registry:dt/commander#2.3.0+20160317120654",
-    "node": "registry:dt/node#4.0.0+20160412142033"
-  }
-}

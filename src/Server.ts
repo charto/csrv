@@ -1,10 +1,14 @@
-// This file is part of csrv, copyright (c) 2016 BusFaster Ltd.
+// This file is part of csrv, copyright (c) 2016-2017 BusFaster Ltd.
 // Released under the MIT license, see LICENSE.
 
 import * as fs from 'fs';
-import * as url from 'url';
+import * as URL from 'url';
 import * as path from 'path';
 import * as http from 'http';
+
+export interface Headers {
+	[key: string]: string | string[] | undefined;
+};
 
 var encoding = '; charset=utf-8';
 
@@ -20,31 +24,33 @@ var mimeTbl: {[extension: string]: string} = {
 /** This is a minimal (but hopefully secure) web server for testing frontends. */
 
 export class Server {
-	constructor(basePath: string) {
-		this.basePath = basePath;
-
+	constructor(public basePath: string) {
 		this.server = http.createServer(
-			(req: http.IncomingMessage, res: http.ServerResponse) =>
-				this.processRequest(req, res)
+			(
+				req: http.IncomingMessage,
+				res: http.ServerResponse
+			) => this.processRequest(req, res)
 		);
 	}
 
 	/** Bind the server to a port. Takes a Node-style callback. */
 
-	listen(port: number, cb: (err: NodeJS.ErrnoException) => void) {
-		this.server.listen(port, () => cb(null)).on('error', cb);
+	listen(port: number, handler?: (err: null | NodeJS.ErrnoException) => void) {
+		if(handler) {
+			this.server.listen(port, () => handler(null)).on('error', handler);
+		} else {
+			this.server.listen(port);
+		}
 	}
 
 	/** Report status with just the code as a body.
 	  * Additional headers can be passed eg. for redirecting. */
 
-	sendStatus(res: http.ServerResponse, status: number, header?: { [key: string]: string | number }) {
-		var body = new Buffer(status + '\n', 'utf-8');
-
-		header = header || {};
+	sendStatus(res: http.ServerResponse, status: number, header: Headers = {}) {
+		const body = new Buffer(status + ' ' + http.STATUS_CODES[status] + '\n', 'utf-8');
 
 		header['Content-Type'] = 'text/plain';
-		header['Content-Length'] = body.length;
+		header['Content-Length'] = '' + body.length;
 
 		res.writeHead(status, header);
 		res.end(body);
@@ -53,12 +59,16 @@ export class Server {
 	processRequest(req: http.IncomingMessage, res: http.ServerResponse) {
 		console.log(req.url);
 
-		var urlParts = url.parse(req.url);
+		const uri = req.url;
+
+		if(!uri) return(this.sendStatus(res, 403));
+
+		const urlParts = URL.parse(uri);
 
 		// Paths must start with / and contain maximum one consecutive potentially dangerous
 		// special character between alphanumeric characters.
 
-		var pathParts = urlParts.pathname.match(/^\/([@_0-9A-Za-z]+[-./]?)*/);
+		const pathParts = urlParts.pathname!.match(/^\/([@_0-9A-Za-z]+[-./]?)*/);
 
 		// Reject all invalid paths.
 
@@ -105,6 +115,4 @@ export class Server {
 	}
 
 	server: http.Server;
-
-	basePath: string;
 }
