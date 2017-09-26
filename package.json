@@ -2,8 +2,8 @@
   "name": "csrv",
   "version": "0.1.0",
   "description": "Compact development web server",
-  "main": "dist/csrv.js",
-  "typings": "dist/csrv.d.ts",
+  "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
   "bin": {
     "csrv": "bin/csrv.js"
   },

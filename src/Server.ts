@@ -28,6 +28,19 @@ var mimeTbl: {[extension: string]: string} = {
 	png: 'image/png'
 };
 
+/** Report status with just the code as a body.
+  * Additional headers can be passed eg. for redirecting. */
+
+export function sendStatus(res: http.ServerResponse, status: number, header: Headers = {}) {
+	const body = new Buffer(status + ' ' + http.STATUS_CODES[status] + '\n', 'utf-8');
+
+	header['Content-Type'] = 'text/plain';
+	header['Content-Length'] = '' + body.length;
+
+	res.writeHead(status, header);
+	res.end(body);
+}
+
 /** This is a minimal (but hopefully secure) web server for testing frontends. */
 
 export class Server {
@@ -50,36 +63,17 @@ export class Server {
 		}
 	}
 
-	/** Report status with just the code as a body.
-	  * Additional headers can be passed eg. for redirecting. */
-
-	sendStatus(res: http.ServerResponse, status: number, header: Headers = {}) {
-		const body = new Buffer(status + ' ' + http.STATUS_CODES[status] + '\n', 'utf-8');
-
-		header['Content-Type'] = 'text/plain';
-		header['Content-Length'] = '' + body.length;
-
-		res.writeHead(status, header);
-		res.end(body);
-	}
-
 	processRequest(req: http.IncomingMessage, res: http.ServerResponse) {
-		console.log(req.url);
-
-		const uri = req.url;
-
-		if(!uri) return(this.sendStatus(res, 403));
-
-		const urlParts = URL.parse(uri);
+		const urlParts = req.url && URL.parse(req.url);
 
 		// Paths must start with / and contain maximum one consecutive potentially dangerous
 		// special character between alphanumeric characters.
 
-		const pathParts = urlParts.pathname!.match(/^\/([@_0-9A-Za-z]+[-./]?)*/);
+		const pathParts = urlParts && urlParts.pathname!.match(/^\/([@_0-9A-Za-z]+[-./]?)*/);
 
 		// Reject all invalid paths.
 
-		if(!pathParts) return(this.sendStatus(res, 403));
+		if(!urlParts || !pathParts) return(sendStatus(res, 403));
 
 		let urlPath = pathParts[0];
 
@@ -92,7 +86,7 @@ export class Server {
 				urlPath = routed;
 			} catch(err) {
 				console.log(err);
-				return(this.sendStatus(res, 500));
+				return(sendStatus(res, 500));
 			}
 		}
 
@@ -110,7 +104,7 @@ export class Server {
 
 			// Redirect accesses to directories not marked as such; append a slash.
 
-			if(stats.isDirectory()) return(this.sendStatus(res, 302, {
+			if(stats.isDirectory()) return(sendStatus(res, 302, {
 				'Location': urlPath + '/' + (urlParts.search || '')
 			}));
 
@@ -130,7 +124,7 @@ export class Server {
 
 			fs.createReadStream(filePath).pipe(res);
 		} catch(err) {
-			this.sendStatus(res, 404);
+			sendStatus(res, 404);
 		}
 	}
 
