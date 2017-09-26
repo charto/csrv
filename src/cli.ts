@@ -3,7 +3,7 @@
 
 import * as path from 'path';
 
-import { Server } from './Server';
+import { Server, RouterType } from './Server';
 
 function usage() {
 	const pkg = require('../package.json');
@@ -19,8 +19,10 @@ function usage() {
 	].join(' '));
 
 	console.log('\n  Start HTTP server with public root in DIRECTORY.');
-	console.log('\n  Options:');
-	console.log('\n    -p, --port=PORT  Bind to given TCP port (default 8080).\n');
+	console.log('\n  Options:\n');
+	console.log('    -i, --include=PATH  Include additional JavaScript file.');
+	console.log('    -r, --router=NAME   Pass req, res to a named router function.');
+	console.log('    -p, --port=PORT     Bind to given TCP port (default 8080).\n');
 
 	process.exit(1);
 
@@ -33,6 +35,8 @@ let port = 8080;
 let basePath: string | undefined;
 
 let arg: string;
+let included: any;
+let router: RouterType | undefined;
 
 for(let i = 2; i < argc; ++i) {
 	arg = process.argv[i];
@@ -47,6 +51,16 @@ for(let i = 2; i < argc; ++i) {
 		if(key == '-p' || key == '--port') {
 			port = parseInt(val, 10);
 			if('' + port != val) throw(usage());
+		} else if(key == '-i' || key == '--include') {
+			try {
+				included = require(path.resolve('.', val));
+			} catch(err) {
+				console.log(err);
+				throw(usage());
+			}
+		} else if(key == '-r' || key == '--router') {
+			router = included[val];
+			if(!router) throw(usage());
 		} else throw(usage());
 	} else basePath = arg;
 }
@@ -55,7 +69,7 @@ if(typeof(basePath) == 'undefined') throw(usage());
 
 basePath = path.resolve('.', basePath);
 
-new Server(basePath).listen(port, (err: NodeJS.ErrnoException) => {
+new Server(basePath, router).listen(port, (err: NodeJS.ErrnoException) => {
 	if(err) {
 		if(err.code == 'EACCES' || err.code == 'EADDRINUSE') {
 			console.error('Error binding to port ' + port);

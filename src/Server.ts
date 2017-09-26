@@ -6,6 +6,13 @@ import * as URL from 'url';
 import * as path from 'path';
 import * as http from 'http';
 
+export type RouterType = (
+	req: http.IncomingMessage,
+	res: http.ServerResponse,
+	urlParts: URL.Url,
+	urlPath: string
+) => string | null | void;
+
 export interface Headers {
 	[key: string]: string | string[] | undefined;
 };
@@ -24,7 +31,7 @@ var mimeTbl: {[extension: string]: string} = {
 /** This is a minimal (but hopefully secure) web server for testing frontends. */
 
 export class Server {
-	constructor(public basePath: string) {
+	constructor(public basePath: string, public router?: RouterType) {
 		this.server = http.createServer(
 			(
 				req: http.IncomingMessage,
@@ -74,7 +81,20 @@ export class Server {
 
 		if(!pathParts) return(this.sendStatus(res, 403));
 
-		var urlPath = pathParts[0];
+		let urlPath = pathParts[0];
+
+		if(this.router) {
+			try {
+				const routed = this.router(req, res, urlParts, urlPath);
+
+				if(!routed) return;
+
+				urlPath = routed;
+			} catch(err) {
+				console.log(err);
+				return(this.sendStatus(res, 500));
+			}
+		}
 
 		// Silently redirect obvious directory paths (ending with a slash) to an index file.
 
